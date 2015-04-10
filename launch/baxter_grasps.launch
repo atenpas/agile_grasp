@@ -1,0 +1,18 @@
+<launch>
+	<node name="find_grasps" pkg="grasp_affordances" type="find_grasps" output="screen">
+  	<param name="cloud_topic" value="/register_clouds/point_cloud_sized" />
+    <param name="cloud_frame" value="/base" />
+    <param name="cloud_type" value="1" />
+    <param name="svm_file_name" value="/home/baxter/baxter_ws/src/grasp_affordances_cpp/svm_032015_20_20_same" />
+    <param name="num_samples" value="8000" />
+    <param name="num_threads" value="4" />
+    <param name="num_clouds" value="1" />
+    <rosparam param="workspace"> [0.55, 0.9, -0.32, 0.05, -0.3, 1] </rosparam>
+    <rosparam param="camera_pose"> [0, 0.445417, 0.895323, 0.215, 
+              1, 0, 0, -0.015, 
+              0, 0.895323, -0.445417, 0.23, 
+              0, 0, 0, 1] </rosparam>
+    <param name="min_inliers" value="10" />
+    <param name="plots" value="false" />
+	</node>
+</launch>
