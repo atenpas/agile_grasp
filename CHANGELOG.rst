@@ -2,6 +2,9 @@
 Changelog for package agile_grasp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.6.2 (2015-04-11)
 ------------------
 * fix some dependencies
