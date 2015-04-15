@@ -1,9 +1,9 @@
 <launch>
-	<node name="find_grasps" pkg="grasp_affordances" type="find_grasps" output="screen">
+	<node name="find_grasps" pkg="agile_grasp" type="find_grasps" output="screen">
   	<param name="cloud_topic" value="/camera/depth_registered/points" />
     <param name="cloud_frame" value="/camera_rgb_optical_frame" />
     <param name="cloud_type" value="0" />
-    <param name="svm_file_name" value="/home/andreas/baxter_ws/src/grasp_affordances_cpp/svm_032015_20_20_same" />
+    <param name="svm_file_name" value="/home/baxter/baxter_ws/src/agile_grasp/svm_032015_20_20_same" />
     <param name="num_samples" value="4000" />
     <param name="num_threads" value="4" />
     <param name="num_clouds" value="1" />
