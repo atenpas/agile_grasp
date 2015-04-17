@@ -60,8 +60,9 @@ int main(int argc, char** argv)
     //workspace << 0.4, 1.0, -0.3, 0.3, -0.2, 2;
     //workspace << 0.55, 0.9, -0.35, 0.2, -0.2, 2;
     //workspace << 0.6, 0.8, -0.25, 0.1, -0.3, 2;
-    workspace << 0.55, 0.95, -0.25, 0.07, -0.3, 1;
+    // workspace << 0.55, 0.95, -0.25, 0.07, -0.3, 1;
     // workspace << -10, 10, -10, 10, -10, 10;
+    workspace << -10, 10, -10, 10, 0.55, 0.95;
 
 	// set-up parameters for the hand search
     Localization loc(num_threads, true, true);

@@ -1,5 +1,5 @@
 <launch>
-	<node name="find_grasps" pkg="grasp_affordances" type="find_grasps" output="screen">
+	<node name="find_grasps" pkg="agile_grasp" type="find_grasps" output="screen">
   	<param name="cloud_topic" value="/register_clouds/point_cloud_sized" />
     <param name="cloud_frame" value="/base" />
     <param name="cloud_type" value="1" />

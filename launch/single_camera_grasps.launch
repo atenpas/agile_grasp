@@ -1,5 +1,5 @@
 <launch>
-	<node name="find_grasps" pkg="grasp_affordances" type="find_grasps" output="screen">
+	<node name="find_grasps" pkg="agile_grasp" type="find_grasps" output="screen">
   	<param name="cloud_topic" value="/camera/depth_registered/points" />
     <param name="cloud_frame" value="/camera_rgb_optical_frame" />
     <param name="cloud_type" value="0" />
