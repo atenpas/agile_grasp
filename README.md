@@ -64,7 +64,7 @@ rosrun agile_grasp test_svm /home/userABC/data/input.pcd /home/userABC/ros_ws/sr
 
 ## 6) Localize Grasps With a Range Sensor
 
-**Usage:** `$ roslaunch roslaunch agile_grasp single_camera_grasps.launch`
+**Usage:** `$ roslaunch agile_grasp single_camera_grasps.launch`
 
 <a href="./readme/vlc1.png"><img src="./readme/vlc1.png" alt="Localized grasps" title="Localized grasps"
 	style="width: 40%; height: 40%" /></a>
