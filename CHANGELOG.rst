@@ -2,8 +2,8 @@
 Changelog for package agile_grasp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2015-05-13)
+------------------
 * update CMakeLists
 * added rviz visualization
 * fixed instructions -> (6)
