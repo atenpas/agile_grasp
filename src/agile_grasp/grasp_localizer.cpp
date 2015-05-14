@@ -6,7 +6,7 @@ GraspLocalizer::GraspLocalizer(ros::NodeHandle& node, const std::string& cloud_t
 	const Parameters& params) 
   : cloud_left_(new PointCloud()), cloud_right_(new PointCloud()), 
   cloud_frame_(cloud_frame), svm_file_name_(svm_file_name), num_clouds_(params.num_clouds_), 
-  num_clouds_received_(0), plots_handles_(params.plots_hands_)
+  num_clouds_received_(0), size_left_(0)
 {
   // subscribe to input point cloud ROS topic
   if (cloud_type == CLOUD_SIZED)
@@ -18,9 +18,8 @@ GraspLocalizer::GraspLocalizer(ros::NodeHandle& node, const std::string& cloud_t
   grasps_pub_ = node.advertise<agile_grasp::Grasps>("grasps", 10);
   
   // create localization object and initialize its parameters
-  localization_ = new Localization(params.num_threads_, true, params.plots_hands_);
-  localization_->setCameraTransforms(params.cam_tf_left_, 
-    params.cam_tf_right_);
+  localization_ = new Localization(params.num_threads_, true, params.plotting_mode_);
+  localization_->setCameraTransforms(params.cam_tf_left_, params.cam_tf_right_);
   localization_->setWorkspace(params.workspace_);
   localization_->setNumSamples(params.num_samples_);
   localization_->setFingerWidth(params.finger_width_);
@@ -28,8 +27,19 @@ GraspLocalizer::GraspLocalizer(ros::NodeHandle& node, const std::string& cloud_t
   localization_->setHandDepth(params.hand_depth_);
   localization_->setInitBite(params.init_bite_);
   localization_->setHandHeight(params.hand_height_);
-  
+		  
   min_inliers_ = params.min_inliers_;
+  
+  if (params.plotting_mode_ == 0)
+  {
+		plots_handles_ = false;
+	}		
+	else
+	{
+		plots_handles_ = false;		
+		if (params.plotting_mode_ == 2)
+			localization_->createVisualsPub(node, params.marker_lifetime_, cloud_frame_);
+	}
 }
 
 
@@ -42,8 +52,8 @@ void GraspLocalizer::cloud_callback(const sensor_msgs::PointCloud2ConstPtr& msg)
   if (cloud_frame_.compare(msg->header.frame_id) != 0 
 			&& cloud_frame_.compare("/" + msg->header.frame_id) != 0)
   {
-    std::cout << "Input cloud frame " << msg->header.frame_id <<
-    " is not equal to parameter " << cloud_frame_ << std::endl;
+    std::cout << "Input cloud frame " << msg->header.frame_id << " is not equal to parameter " << cloud_frame_ 
+			<< std::endl;
     std::exit(EXIT_FAILURE);
   }
   
@@ -91,10 +101,12 @@ void GraspLocalizer::localizeGrasps()
         hands_ = localization_->localizeHands(cloud, cloud_left_->size(), indices, false, false);
       }
       else
-        hands_ = localization_->localizeHands(cloud_left_, size_left_, indices, false, false);
+      {
+        hands_ = localization_->localizeHands(cloud_left_, cloud_left_->size(), indices, false, false);
+			}
       
       antipodal_hands_ = localization_->predictAntipodalHands(hands_, svm_file_name_);
-      handles_ = localization_->findHandles(antipodal_hands_, min_inliers_, 0.005, plots_handles_);
+      handles_ = localization_->findHandles(antipodal_hands_, min_inliers_, 0.005);
       
       // publish handles
       grasps_pub_.publish(createGraspsMsg(handles_));

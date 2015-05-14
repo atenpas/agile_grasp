@@ -89,10 +89,13 @@ public:
     double hand_depth_;
     double hand_height_;
     double init_bite_;
-    bool plots_hands_;
-    
+        
     // handle search parameters
     int min_inliers_;
+    
+    // visualization parameters
+		int plotting_mode_;
+		double marker_lifetime_;
   };
   
   /**

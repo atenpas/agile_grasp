@@ -2,10 +2,18 @@
 
 std::vector<GraspHypothesis> Localization::localizeHands(const PointCloud::Ptr& cloud_in, int size_left,
 	const std::vector<int>& indices, bool calculates_antipodal, bool uses_clustering)
-{
+{		
 	double t0 = omp_get_wtime();
 	std::vector<GraspHypothesis> hand_list;
-
+	
+	if (size_left == 0 || cloud_in->size() == 0)
+	{
+		std::cout << "Input cloud is empty!\n";
+		std::cout << size_left << std::endl;
+		hand_list.resize(0);
+		return hand_list;
+	}
+	
 	// set camera source for all points (0 = left, 1 = right)
 	std::cout << "Generating camera sources for " << cloud_in->size() << " points ...\n";
 	Eigen::VectorXi pts_cam_source(cloud_in->size());
@@ -92,11 +100,17 @@ std::vector<GraspHypothesis> Localization::localizeHands(const PointCloud::Ptr& 
 	// draw down-sampled and workspace reduced cloud
 	cloud_plot = cloud;
   
-  // find hand configurations
-  HandSearch hand_search(finger_width_, hand_outer_diameter_, hand_depth_, 
-    hand_height_, init_bite_, num_threads_, num_samples_, plots_hands_);
-	hand_list = hand_search.findHands(cloud, pts_cam_source, indices, cloud_plot, 
-    calculates_antipodal, uses_clustering);
+  // set plotting within handle search on/off  
+  bool plots_hands;
+  if (plotting_mode_ == PCL_PLOTTING)
+		plots_hands = true;
+  else
+		plots_hands = false;
+		
+	// find hand configurations
+  HandSearch hand_search(finger_width_, hand_outer_diameter_, hand_depth_, hand_height_, init_bite_, num_threads_, 
+		num_samples_, plots_hands);
+	hand_list = hand_search.findHands(cloud, pts_cam_source, indices, cloud_plot, calculates_antipodal, uses_clustering);
 
 	// remove hands at boundaries of workspace
 	if (filters_boundaries_)
@@ -109,14 +123,20 @@ std::vector<GraspHypothesis> Localization::localizeHands(const PointCloud::Ptr& 
 	double t2 = omp_get_wtime();
 	std::cout << "Hand localization done in " << t2 - t0 << " sec\n";
 
-	if (plots_hands_)
+	if (plotting_mode_ == PCL_PLOTTING)
+	{
 		plot_.plotHands(hand_list, cloud_plot, "");
+	}
+	else if (plotting_mode_ == RVIZ_PLOTTING)
+	{
+		plot_.plotGraspsRviz(hand_list, visuals_frame_);
+	}
 
 	return hand_list;
 }
 
-std::vector<GraspHypothesis> Localization::predictAntipodalHands(
-	const std::vector<GraspHypothesis>& hand_list, const std::string& svm_filename)
+std::vector<GraspHypothesis> Localization::predictAntipodalHands(const std::vector<GraspHypothesis>& hand_list, 
+	const std::string& svm_filename)
 {
 	double t0 = omp_get_wtime();
 	std::vector<GraspHypothesis> antipodal_hands;
@@ -127,8 +147,10 @@ std::vector<GraspHypothesis> Localization::predictAntipodalHands(
 	antipodal_hands = learn.classify(hand_list, svm_filename, cams_mat);
 	std::cout << " runtime: " << omp_get_wtime() - t0 << " sec\n";
 	std::cout << antipodal_hands.size() << " antipodal hand configurations found\n"; 
-  if (plots_hands_)
+  if (plotting_mode_ == PCL_PLOTTING)
 		plot_.plotHands(hand_list, antipodal_hands, cloud_, "Antipodal Hands");
+	else if (plotting_mode_ == RVIZ_PLOTTING)
+		plot_.plotGraspsRviz(antipodal_hands, visuals_frame_, true);
 	return antipodal_hands;
 }
 
@@ -354,11 +376,13 @@ std::vector<GraspHypothesis> Localization::filterHands(const std::vector<GraspHy
 }
 
 std::vector<Handle> Localization::findHandles(const std::vector<GraspHypothesis>& hand_list, int min_inliers,
-	double min_length, bool is_plotting)
+	double min_length)
 {
 	HandleSearch handle_search;
 	std::vector<Handle> handles = handle_search.findHandles(hand_list, min_inliers, min_length);
-	if (is_plotting)
-		handle_search.plotHandles(handles, cloud_, "");
+	if (plotting_mode_ == PCL_PLOTTING)
+		plot_.plotHandles(handles, cloud_, "Handles");
+	else if (plotting_mode_ == RVIZ_PLOTTING)
+		plot_.plotHandlesRviz(handles, visuals_frame_);
 	return handles;
 }

@@ -197,3 +197,210 @@ boost::shared_ptr<pcl::visualization::PCLVisualizer> Plot::createViewer(std::str
   viewer->setBackgroundColor(1, 1, 1); 
   return viewer;
 }
+
+
+void Plot::createVisualPublishers(ros::NodeHandle& node, double marker_lifetime)
+{
+  hypotheses_pub_ = node.advertise<visualization_msgs::MarkerArray>("grasp_hypotheses_visual", 10);
+  antipodal_pub_ = node.advertise<visualization_msgs::MarkerArray>("antipodal_grasps_visual", 10);
+  handles_pub_ = node.advertise<visualization_msgs::MarkerArray>("handles_visual", 10);
+  marker_lifetime_ = marker_lifetime;
+}
+
+void Plot::plotGraspsRviz(const std::vector<GraspHypothesis>& hand_list, const std::string& frame, bool is_antipodal)
+{  
+  double red[3] = {1, 0, 0};
+  double cyan[3] = {0, 1, 1};
+  double* color;
+  if (is_antipodal)
+  {
+		color = red;
+		std::cout << "Visualizing antipodal grasps in Rviz ...\n";
+	}
+	else
+	{
+		color = cyan;
+		std::cout << "Visualizing grasp hypotheses in Rviz ...\n";
+	}
+  
+  visualization_msgs::MarkerArray marker_array;
+  marker_array.markers.resize(hand_list.size());  
+  
+  for (int i=0; i < hand_list.size(); i++)
+  {
+    geometry_msgs::Point position;
+    position.x = hand_list[i].getGraspSurface()(0);
+    position.y = hand_list[i].getGraspSurface()(1);
+    position.z = hand_list[i].getGraspSurface()(2);
+    visualization_msgs::Marker marker = createApproachMarker(frame, position, hand_list[i].getApproach(), i, color, 0.4, 
+			0.004);
+		marker.ns = "grasp_hypotheses";
+		marker.id = i;
+    marker_array.markers[i] = marker;
+  }
+  
+  if (is_antipodal)
+		antipodal_pub_.publish(marker_array);
+  else
+		hypotheses_pub_.publish(marker_array);
+  
+  ros::Duration(1.0).sleep();
+}
+
+
+void Plot::plotHandlesRviz(const std::vector<Handle>& handle_list, const std::string& frame)
+{
+	std::cout << "Visualizing handles in Rviz ...\n";
+  double green[3] = {0, 1, 0};
+  visualization_msgs::MarkerArray marker_array;
+  marker_array.markers.resize(handle_list.size());  
+  
+  for (int i=0; i < handle_list.size(); i++)
+  {
+    geometry_msgs::Point position;
+    position.x = handle_list[i].getHandsCenter()(0);
+    position.y = handle_list[i].getHandsCenter()(1);
+    position.z = handle_list[i].getHandsCenter()(2);    
+    visualization_msgs::Marker marker = createApproachMarker(frame, position, handle_list[i].getApproach(), i, green, 0.6,
+			0.008);		
+    marker.ns = "handles";
+		marker_array.markers[i] = marker;
+  }
+  
+  handles_pub_.publish(marker_array);
+  ros::Duration(1.0).sleep();
+}
+
+
+void Plot::plotHandles(const std::vector<Handle>& handle_list, const PointCloud::Ptr& cloud, std::string str)
+{
+	double colors[10][3] = { { 0, 0.4470, 0.7410 }, { 0.8500, 0.3250, 0.0980 }, { 0.9290, 0.6940, 0.1250 }, {
+			0.4940, 0.1840, 0.5560 }, { 0.4660, 0.6740, 0.1880 }, { 0.3010, 0.7450, 0.9330 }, { 0.6350, 0.0780,
+			0.1840 }, { 0, 0.4470, 0.7410 }, { 0.8500, 0.3250, 0.0980 }, { 0.9290, 0.6940, 0.1250} };
+
+	//	    0.4940    0.1840    0.5560
+	//	    0.4660    0.6740    0.1880
+	//	    0.3010    0.7450    0.9330
+	//	    0.6350    0.0780    0.1840
+	//	         0    0.4470    0.7410
+	//	    0.8500    0.3250    0.0980
+	//	    0.9290    0.6940    0.1250
+	//	    0.4940    0.1840    0.5560
+	//	    0.4660    0.6740    0.1880
+	//	    0.3010    0.7450    0.9330
+	//	    0.6350    0.0780    0.1840
+
+	std::vector<pcl::PointCloud<pcl::PointNormal>::Ptr> clouds;
+	pcl::PointCloud<pcl::PointNormal>::Ptr handle_cloud(new pcl::PointCloud<pcl::PointNormal>());
+
+	for (int i = 0; i < handle_list.size(); i++)
+	{
+		pcl::PointNormal p;
+		p.x = handle_list[i].getHandsCenter()(0);
+		p.y = handle_list[i].getHandsCenter()(1);
+		p.z = handle_list[i].getHandsCenter()(2);
+		p.normal[0] = -handle_list[i].getApproach()(0);
+		p.normal[1] = -handle_list[i].getApproach()(1);
+		p.normal[2] = -handle_list[i].getApproach()(2);
+		handle_cloud->points.push_back(p);
+
+		const std::vector<int>& inliers = handle_list[i].getInliers();
+		const std::vector<GraspHypothesis>& hand_list = handle_list[i].getHandList();
+		pcl::PointCloud<pcl::PointNormal>::Ptr axis_cloud(new pcl::PointCloud<pcl::PointNormal>);
+
+		for (int j = 0; j < inliers.size(); j++)
+		{
+			pcl::PointNormal p;
+			p.x = hand_list[inliers[j]].getGraspSurface()(0);
+			p.y = hand_list[inliers[j]].getGraspSurface()(1);
+			p.z = hand_list[inliers[j]].getGraspSurface()(2);
+			p.normal[0] = -hand_list[inliers[j]].getApproach()(0);
+			p.normal[1] = -hand_list[inliers[j]].getApproach()(1);
+			p.normal[2] = -hand_list[inliers[j]].getApproach()(2);
+			axis_cloud->points.push_back(p);
+		}
+		clouds.push_back(axis_cloud);
+	}
+
+	std::string title = "Handles: " + str;
+	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer(new pcl::visualization::PCLVisualizer(title));
+	viewer->setBackgroundColor(1, 1, 1);
+  //viewer->setPosition(0, 0);
+  //viewer->setSize(640, 480);  
+	viewer->addPointCloud<pcl::PointXYZ>(cloud, "registered point cloud");
+	viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1,
+			"registered point cloud");
+	viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0.0, 1.0, 0.0,
+			"registered point cloud");
+
+	for (int i = 0; i < clouds.size(); i++)
+	{
+		std::string name = "handle_" + boost::lexical_cast<std::string>(i);
+		int ci = i % 6;
+//		std::cout << "ci: " << ci << "\n";
+		viewer->addPointCloud<pcl::PointNormal>(clouds[i], name);
+		viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, colors[ci][0],
+				colors[ci][1], colors[ci][2], name);
+		std::string name2 = "approach_" + boost::lexical_cast<std::string>(i);
+		viewer->addPointCloudNormals<pcl::PointNormal>(clouds[i], 1, 0.04, name2);
+		viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, 2, name2);
+		viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, colors[ci][0],
+				colors[ci][1], colors[ci][2], name2);
+	}
+
+	viewer->addPointCloud<pcl::PointNormal>(handle_cloud, "handles");
+	viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 0, "handles");
+	viewer->addPointCloudNormals<pcl::PointNormal>(handle_cloud, 1, 0.08, "approach");
+	viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_LINE_WIDTH, 4, "approach");
+	viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 0, "approach");
+
+	// viewer->addCoordinateSystem(1.0, "", 0);
+	viewer->initCameraParameters();
+  viewer->setPosition(0, 0);
+	viewer->setSize(640, 480);
+
+	while (!viewer->wasStopped())
+	{
+		viewer->spinOnce(100);
+		boost::this_thread::sleep(boost::posix_time::microseconds(100000));
+	}
+  
+  viewer->close();
+}
+
+
+visualization_msgs::Marker Plot::createApproachMarker(const std::string& frame, const geometry_msgs::Point& center, 
+	const Eigen::Vector3d& approach, int id, const double* color, double alpha, double diam)
+{
+  visualization_msgs::Marker marker = createMarker(frame);
+  marker.type = visualization_msgs::Marker::ARROW;
+  marker.id = id;
+  marker.scale.x = diam; // shaft diameter
+  marker.scale.y = diam; // head diameter
+  marker.scale.z = 0.01; // head length
+  marker.color.r = color[0];
+  marker.color.g = color[1];
+  marker.color.b = color[2];
+  marker.color.a = alpha;
+  geometry_msgs::Point p, q;
+  p.x = center.x;
+  p.y = center.y;
+  p.z = center.z;
+  q.x = p.x - 0.03 * approach(0);
+  q.y = p.y - 0.03 * approach(1);
+  q.z = p.z - 0.03 * approach(2);
+  marker.points.push_back(p);
+  marker.points.push_back(q);
+  return marker;
+}
+
+
+visualization_msgs::Marker Plot::createMarker(const std::string& frame)
+{
+  visualization_msgs::Marker marker;
+  marker.header.frame_id = frame;
+  marker.header.stamp = ros::Time::now();
+  marker.lifetime = ros::Duration(marker_lifetime_);
+  marker.action = visualization_msgs::Marker::ADD;
+  return marker;
+}

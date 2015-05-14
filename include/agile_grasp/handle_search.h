@@ -38,8 +38,11 @@
 #include <pcl/point_cloud.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
-#include <agile_grasp/handle.h>
+#include <ros/ros.h>
+
 #include <agile_grasp/grasp_hypothesis.h>
+#include <agile_grasp/handle.h>
+#include <agile_grasp/plot.h>
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 
@@ -54,7 +57,7 @@ typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 class HandleSearch
 {
 public:
-	
+		
 	/**
 	 * \brief Search for handles given a list of grasp hypotheses.
 	 * \param hand_list the list of grasp hypotheses
@@ -64,13 +67,6 @@ public:
 	*/
 	std::vector<Handle> findHandles(const std::vector<GraspHypothesis>& hand_list, int min_inliers, double min_length);
 
-	/**
-	 * \brief Plot a list of handles.
-	 * \param handle_list the list of handles to be plotted
-	 * \param cloud the cloud to be plotted
-	 * \param str the title of the plotting window
-	*/
-	void plotHandles(const std::vector<Handle>& handle_list, const PointCloud::Ptr& cloud, std::string str);
 
 private:
 	

@@ -152,8 +152,8 @@ target_link_libraries(opencv_test ${OpenCV_LIBRARIES})
 target_link_libraries(handle rotating_hand)
 target_link_libraries(find_grasps grasp_localizer ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 target_link_libraries(grasp_localizer handle localization rotating_hand ${catkin_LIBRARIES} ${PCL_LIBRARIES})
-target_link_libraries(handle_search handle rotating_hand ${PCL_LIBRARIES})
-target_link_libraries(plot grasp_hypothesis quadric ${PCL_LIBRARIES})
+target_link_libraries(handle_search handle plot rotating_hand ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(plot grasp_hypothesis handle quadric ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 target_link_libraries(hand_search finger_hand grasp_hypothesis plot quadric rotating_hand ${PCL_LIBRARIES})
 
 #############

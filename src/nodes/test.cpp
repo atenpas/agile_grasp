@@ -61,10 +61,10 @@ int main(int argc, char** argv)
     //workspace << 0.55, 0.9, -0.35, 0.2, -0.2, 2;
     //workspace << 0.6, 0.8, -0.25, 0.1, -0.3, 2;
     // workspace << 0.55, 0.95, -0.25, 0.07, -0.3, 1;
-    // workspace << -10, 10, -10, 10, -10, 10;
-    workspace << -10, 10, -10, 10, 0.55, 0.95;
+    workspace << -10, 10, -10, 10, -10, 10;
+    // workspace << -10, 10, -10, 10, 0.55, 0.95;
 
-	// set-up parameters for the hand search
+		// set-up parameters for the hand search
     Localization loc(num_threads, true, true);
     loc.setCameraTransforms(base_tf * sqrt_tf.inverse(), base_tf * sqrt_tf);
     loc.setWorkspace(workspace);
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 //    // test with randomly sampled indices
     std::vector<GraspHypothesis> hands = loc.localizeHands(file_name_left, file_name_right);
     std::vector<GraspHypothesis> antipodal_hands = loc.predictAntipodalHands(hands, svm_file_name);
-    std::vector<Handle> handles = loc.findHandles(antipodal_hands, min_inliers, 0.005, true);
+    std::vector<Handle> handles = loc.findHandles(antipodal_hands, min_inliers, 0.005);
 
     return 0;
   }

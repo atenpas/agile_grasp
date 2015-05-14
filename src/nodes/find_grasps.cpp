@@ -19,6 +19,7 @@ const double WORKSPACE[6] = {0.65, 0.9, -0.2, 0.07, -0.3, 1.0};
 const int MIN_HANDLE_INLIERS = 3;
 const int CLOUD_TYPE = 0;
 const std::string CLOUD_TYPES[2] = {"sensor_msgs/PointCloud2", "grasp_affordances/CloudSized"};
+const std::string PLOT_MODES[3] = {"none", "pcl", "rviz"};
 
 
 int main(int argc, char** argv)
@@ -64,8 +65,9 @@ int main(int argc, char** argv)
   node.param("min_inliers", params.min_inliers_, MIN_HANDLE_INLIERS);
   node.getParam("workspace", workspace);
   node.getParam("camera_pose", camera_pose);
-  node.param("plots", params.plots_hands_, false);
-
+  node.param("plotting", params.plotting_mode_, 0);
+  node.param("marker_lifetime", params.marker_lifetime_, 0.0);
+  
   Eigen::Matrix4d R;
   for (int i=0; i < R.rows(); i++)
     R.row(i) << camera_pose[i*R.cols()], camera_pose[i*R.cols() + 1], camera_pose[i*R.cols() + 2], camera_pose[i*R.cols() + 3];  
@@ -83,8 +85,7 @@ int main(int argc, char** argv)
   std::cout << "  workspace: " << ws.transpose() << "\n";
   std::cout << "  num_samples: " << params.num_samples_ << "\n";
   std::cout << "  num_threads: " << params.num_threads_ << "\n";
-  std::cout << "  num_clouds: " << params.num_clouds_ << "\n";
-  std::cout << "  plots: " << params.plots_hands_ << "\n";
+  std::cout << "  num_clouds: " << params.num_clouds_ << "\n";  
   std::cout << "  camera pose:\n" << R << std::endl;
   std::cout << " Robot Hand Model\n";
   std::cout << "  finger_width: " << params.finger_width_ << "\n";
@@ -96,6 +97,9 @@ int main(int argc, char** argv)
   std::cout << "  svm_file_name: " << svm_file_name << "\n";
   std::cout << " Handle Search\n";
   std::cout << "  min_inliers: " << params.min_inliers_ << "\n";
+  std::cout << " Visualization\n";
+  std::cout << "  plot_mode: " << PLOT_MODES[params.plotting_mode_] << "\n";
+  std::cout << "  marker_lifetime: " << params.marker_lifetime_ << "\n";
   
   GraspLocalizer loc(node, cloud_topic, cloud_frame, cloud_type, svm_file_name, params);
   loc.localizeGrasps();

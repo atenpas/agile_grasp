@@ -72,8 +72,7 @@ public:
 	/**
 	 * \brief Default Constructor.
 	*/
-	Localization() : num_threads_(1), plots_hands_(true), 
-    plots_camera_sources_(false), cloud_(new PointCloud)
+	Localization() : num_threads_(1), plotting_mode_(1), plots_camera_sources_(false), cloud_(new PointCloud)
 	{ }
 	
 	/**
@@ -82,9 +81,9 @@ public:
 	 * \param filter_boundaries whether grasp hypotheses that are close to the point cloud boundaries are filtered out
 	 * \param plots_hands whether grasp hypotheses are plotted
 	*/
-	Localization(int num_threads, bool filters_boundaries, bool plots_hands) :
+	Localization(int num_threads, bool filters_boundaries, int plotting_mode) :
 			num_threads_(num_threads), filters_boundaries_(filters_boundaries), 
-      plots_hands_(plots_hands), plots_camera_sources_(false), 
+      plotting_mode_(plotting_mode), plots_camera_sources_(false), 
       cloud_(new PointCloud)
 	{ }
 	
@@ -95,8 +94,7 @@ public:
 	 * \param min_length the minimum length of the handle
 	 * \param is_plotting whether the handles are plotted
 	*/
-	std::vector<Handle> findHandles(const std::vector<GraspHypothesis>& hand_list, int min_inliers,
-			double min_length, bool is_plotting = false);
+	std::vector<Handle> findHandles(const std::vector<GraspHypothesis>& hand_list, int min_inliers,	double min_length);
 	
 	/**
 	 * \brief Predict antipodal grasps given a list of grasp hypotheses.
@@ -246,6 +244,20 @@ public:
 	{
 		hand_height_ = hand_height;
 	}
+		
+	/**
+	 * \brief Set the publisher for Rviz visualization, the lifetime of visual markers, and the frame associated with 
+	 * the grasps.
+	 * \param node the ROS node
+	 * \param marker_lifetime the lifetime of each visual marker
+	 * \param frame the frame to which the grasps belong
+	*/ 
+	void createVisualsPub(ros::NodeHandle& node, double marker_lifetime, const std::string& frame)
+	{
+		plot_.createVisualPublishers(node, marker_lifetime);
+		visuals_frame_ = frame;
+	}
+	
 
 private:
 
@@ -324,9 +336,15 @@ private:
 	double hand_depth_; ///< hand depth (finger length)
 	double hand_height_; ///< hand height
 	double init_bite_; ///< initial bite
-  bool plots_camera_sources_; ///< whether the camera source is plotted for each point in the point cloud
-	bool plots_hands_; ///< whether the results of the grasp hypothesis search are plotted
+  bool plots_camera_sources_; ///< whether the camera source is plotted for each point in the point cloud	
 	bool filters_boundaries_; ///< whether grasp hypotheses close to the workspace boundaries are filtered out
+	int plotting_mode_; ///< what plotting mode is used
+	std::string visuals_frame_; ///< visualization frame for Rviz
+	
+	/** constants for plotting modes */
+	static const int NO_PLOTTING = 0; ///< no plotting
+	static const int PCL_PLOTTING = 1; ///< plotting in PCL
+	static const int RVIZ_PLOTTING = 2; ///< plotting in Rviz
 };
 
 #endif

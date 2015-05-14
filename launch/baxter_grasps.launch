@@ -3,7 +3,7 @@
   	<param name="cloud_topic" value="/register_clouds/point_cloud_sized" />
     <param name="cloud_frame" value="/base" />
     <param name="cloud_type" value="1" />
-    <param name="svm_file_name" value="/home/baxter/baxter_ws/src/grasp_affordances_cpp/svm_032015_20_20_same" />
+    <param name="svm_file_name" value="$(find agile_grasp)/svm_032015_20_20_same" />
     <param name="num_samples" value="8000" />
     <param name="num_threads" value="4" />
     <param name="num_clouds" value="1" />
