@@ -42,7 +42,7 @@
 
 #include <agile_grasp/grasp_hypothesis.h>
 #include <agile_grasp/handle.h>
-#include <agile_grasp/plot.h>
+
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 
