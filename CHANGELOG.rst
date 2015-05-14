@@ -4,6 +4,13 @@ Changelog for package agile_grasp
 
 Forthcoming
 -----------
+* update CMakeLists
+* added rviz visualization
+* fixed instructions -> (6)
+* added instructions
+* fixed launch files
+* Contributors: atp
+
 * added rviz visualization
 * fixed instructions -> (6)
 * added instructions
