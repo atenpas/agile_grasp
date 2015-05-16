@@ -7,6 +7,13 @@ Changelog for package agile_grasp
 * added dependency for visualization msgs
 * Contributors: Andreas
 
+Forthcoming
+-----------
+* 0.7.1
+* update CHANGELOG.rst
+* added dependency for visualization msgs
+* Contributors: Andreas, atp
+
 0.7.0 (2015-05-13)
 ------------------
 * update CMakeLists

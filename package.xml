@@ -6,9 +6,9 @@
   finds antipodal grasps in point clouds.</description>
   <maintainer email="atp@ccs.neu.edu">Andreas ten Pas</maintainer>
   <license>BSD</license>
-
   <url type="website">http://wiki.ros.org/agile_grasp</url>
-
+  <author>Andreas ten Pas</author>
+  
   <buildtool_depend>catkin</buildtool_depend>
  
 	<build_depend>cmake_modules</build_depend>
