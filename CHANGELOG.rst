@@ -3,8 +3,8 @@ Changelog for package agile_grasp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-Forthcoming
------------
+0.7.0 (2015-05-16)
+------------------
 * Merge branch 'master' into hydro
 * adjust CMakeLists.txt and package.xml for ROS Hydro
 * added dependency for visualization msgs
