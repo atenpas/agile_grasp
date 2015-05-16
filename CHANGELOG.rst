@@ -2,8 +2,8 @@
 Changelog for package agile_grasp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.1 (2015-05-16)
+------------------
 * added dependency for visualization msgs
 * Contributors: Andreas
 
