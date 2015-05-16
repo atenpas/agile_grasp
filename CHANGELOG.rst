@@ -2,6 +2,11 @@
 Changelog for package agile_grasp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added dependency for visualization msgs
+* Contributors: Andreas
+
 0.7.0 (2015-05-13)
 ------------------
 * update CMakeLists
