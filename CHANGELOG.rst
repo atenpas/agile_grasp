@@ -9,6 +9,12 @@ Changelog for package agile_grasp
 
 Forthcoming
 -----------
+* added author to package.xml
+* 0.7.1
+* update CHANGELOG.rst
+* added dependency for visualization msgs
+* Contributors: Andreas, atp
+
 * 0.7.1
 * update CHANGELOG.rst
 * added dependency for visualization msgs
