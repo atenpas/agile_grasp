@@ -7,8 +7,8 @@ Changelog for package agile_grasp
 * added dependency for visualization msgs
 * Contributors: Andreas
 
-Forthcoming
------------
+0.7.2 (2015-05-16)
+------------------
 * added author to package.xml
 * 0.7.1
 * update CHANGELOG.rst
