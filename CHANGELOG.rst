@@ -5,6 +5,19 @@ Changelog for package agile_grasp
 
 Forthcoming
 -----------
+* added Rviz visualization
+* 0.7.0
+* update CHANGELOG
+* Merge branch 'master' into hydro
+* adjust CMakeLists.txt and package.xml for ROS Hydro
+* added dependency for visualization msgs
+* fixed package name in launch files
+* changed version number
+* 0.6.3
+* removed screenshots folder
+* hydro version
+* Contributors: Andreas, baxter
+
 * 0.7.0
 * update CHANGELOG
 * Merge branch 'master' into hydro
