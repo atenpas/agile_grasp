@@ -8,14 +8,15 @@ const std::string CLOUD_TOPIC = "input_cloud";
 const std::string CLOUD_FRAME = "camera_rgb_optical_frame";
 const std::string SVM_FILE_NAME = "/home/baxter/svm";
 const int NUM_THREADS = 1;
-const int NUM_SAMPLES = 1000;
+const int NUM_SAMPLES = 2000;
 const int NUM_CLOUDS = 2;
 const double FINGER_WIDTH = 0.01;
 const double HAND_OUTER_DIAMETER = 0.09;
 const double HAND_DEPTH = 0.06;
 const double INIT_BITE = 0.01;
 const double HAND_HEIGHT = 0.02;
-const double WORKSPACE[6] = {0.65, 0.9, -0.2, 0.07, -0.3, 1.0};
+// const double WORKSPACE[6] = {0.65, 0.9, -0.2, 0.07, -0.3, 1.0};
+const double WORKSPACE[6] = {-1.0, 1.0, -1.0, 1.0, -1.0, 1.0};
 const int MIN_HANDLE_INLIERS = 3;
 const int CLOUD_TYPE = 0;
 const std::string CLOUD_TYPES[2] = {"sensor_msgs/PointCloud2", "grasp_affordances/CloudSized"};
@@ -68,10 +69,15 @@ int main(int argc, char** argv)
   node.param("plotting", params.plotting_mode_, 0);
   node.param("marker_lifetime", params.marker_lifetime_, 0.0);
   
-  Eigen::Matrix4d R;
-  for (int i=0; i < R.rows(); i++)
-    R.row(i) << camera_pose[i*R.cols()], camera_pose[i*R.cols() + 1], camera_pose[i*R.cols() + 2], camera_pose[i*R.cols() + 3];  
-    
+  if (camera_pose.size() > 0)
+  {
+    Eigen::Matrix4d R;
+    for (int i=0; i < R.rows(); i++)
+      R.row(i) << camera_pose[i*R.cols()], camera_pose[i*R.cols() + 1], camera_pose[i*R.cols() + 2], camera_pose[i*R.cols() + 3];  
+      params.cam_tf_left_ = R;
+    std::cout << "  camera pose:\n" << R << std::endl;
+  }
+        
   Eigen::VectorXd ws(6);
   ws << workspace[0], workspace[1], workspace[2], workspace[3], workspace[4], workspace[5];
   params.workspace_ = ws;
@@ -86,7 +92,6 @@ int main(int argc, char** argv)
   std::cout << "  num_samples: " << params.num_samples_ << "\n";
   std::cout << "  num_threads: " << params.num_threads_ << "\n";
   std::cout << "  num_clouds: " << params.num_clouds_ << "\n";  
-  std::cout << "  camera pose:\n" << R << std::endl;
   std::cout << " Robot Hand Model\n";
   std::cout << "  finger_width: " << params.finger_width_ << "\n";
   std::cout << "  hand_outer_diameter: " << params.hand_outer_diameter_ << "\n";

@@ -109,7 +109,7 @@ std::vector<GraspHypothesis> Localization::localizeHands(const PointCloud::Ptr& 
 		
 	// find hand configurations
   HandSearch hand_search(finger_width_, hand_outer_diameter_, hand_depth_, hand_height_, init_bite_, num_threads_, 
-		num_samples_, plots_hands);
+		num_samples_, cam_tf_left_, plots_hands);
 	hand_list = hand_search.findHands(cloud, pts_cam_source, indices, cloud_plot, calculates_antipodal, uses_clustering);
 
 	// remove hands at boundaries of workspace
@@ -125,7 +125,11 @@ std::vector<GraspHypothesis> Localization::localizeHands(const PointCloud::Ptr& 
 
 	if (plotting_mode_ == PCL_PLOTTING)
 	{
-		plot_.plotHands(hand_list, cloud_plot, "");
+		plot_.plotHands(hand_list, cloud_plot, "Hands");
+	}
+	else if (plotting_mode_ == PCL_PLOTTING_FINGERS)
+	{
+	  plot_.plotFingers(hand_list, cloud_plot, "Hands");
 	}
 	else if (plotting_mode_ == RVIZ_PLOTTING)
 	{
@@ -148,9 +152,17 @@ std::vector<GraspHypothesis> Localization::predictAntipodalHands(const std::vect
 	std::cout << " runtime: " << omp_get_wtime() - t0 << " sec\n";
 	std::cout << antipodal_hands.size() << " antipodal hand configurations found\n"; 
   if (plotting_mode_ == PCL_PLOTTING)
+  {
 		plot_.plotHands(hand_list, antipodal_hands, cloud_, "Antipodal Hands");
+  }
+  else if (plotting_mode_ == PCL_PLOTTING_FINGERS)
+  {
+    plot_.plotFingers(antipodal_hands, cloud_, "Antipodal Hands");
+  }
 	else if (plotting_mode_ == RVIZ_PLOTTING)
+	{
 		plot_.plotGraspsRviz(antipodal_hands, visuals_frame_, true);
+	}
 	return antipodal_hands;
 }
 
@@ -381,8 +393,16 @@ std::vector<Handle> Localization::findHandles(const std::vector<GraspHypothesis>
 	HandleSearch handle_search;
 	std::vector<Handle> handles = handle_search.findHandles(hand_list, min_inliers, min_length);
 	if (plotting_mode_ == PCL_PLOTTING)
+	{
 		plot_.plotHandles(handles, cloud_, "Handles");
+	}
+	else if (plotting_mode_ == PCL_PLOTTING_FINGERS)
+	{
+		plot_.plotFingers(handles, cloud_, "Handles");
+	}
 	else if (plotting_mode_ == RVIZ_PLOTTING)
+	{
 		plot_.plotHandlesRviz(handles, visuals_frame_);
+	}
 	return handles;
 }

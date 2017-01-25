@@ -120,6 +120,10 @@ public:
 		return inliers_;
 	}
 
+  const Eigen::Vector3d& getBinormal() const {
+    return binormal_;
+  }
+
 private:
 	
 	/**
@@ -147,6 +151,7 @@ private:
 	Eigen::Vector3d center_; ///< the center of the "average" grasp
 	Eigen::Vector3d axis_; ///< the hand axis of the "average" grasp
 	Eigen::Vector3d approach_; ///< the approach vector of the "average" grasp
+	Eigen::Vector3d binormal_; ///< the binormal vector of the "average" grasp
 	double width_; ///< the width of the object contained in the "average" grasp
 	Eigen::Vector3d hands_center_; ///< the center of the "average" grasp projected onto the back of the hand
 	Eigen::VectorXd dist_along_handle_; ///< the 1xn vector of distances along the handle's axis for each grasp hypothesis

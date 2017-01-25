@@ -37,6 +37,10 @@ int main(int argc, char** argv)
     int min_inliers = 3;
     if (argc > 5)
       min_inliers = atoi(argv[5]);
+      
+    int plot_mode = 0;
+    if (argc > 6)
+      plot_mode = atoi(argv[6]);
 
     double taubin_radius = 0.03;
     double hand_radius = 0.08;
@@ -65,7 +69,7 @@ int main(int argc, char** argv)
     // workspace << -10, 10, -10, 10, 0.55, 0.95;
 
 		// set-up parameters for the hand search
-    Localization loc(num_threads, true, true);
+    Localization loc(num_threads, true, plot_mode);
     loc.setCameraTransforms(base_tf * sqrt_tf.inverse(), base_tf * sqrt_tf);
     loc.setWorkspace(workspace);
     loc.setNumSamples(num_samples);
@@ -96,8 +100,13 @@ int main(int argc, char** argv)
   }
 
   std::cout << "No PCD filename given!\n";
-  std::cout << "Usage: test_svm pcd_filename svm_filename [num_samples] [num_threads] [min_handle_inliers]\n";
+  std::cout << "Usage: test_svm pcd_filename svm_filename [num_samples] [num_threads] [min_handle_inliers] [plot_mode]\n";
   std::cout << "Localize grasps in a *.pcd file using a trained SVM.\n";
+  std::cout << "Parameters:\n";
+  std::cout << "  num_samples: number of samples to draw from the point cloud\n";
+  std::cout << "  num_threads: number of CPU threads to use\n";
+  std::cout << "  min_handle_inliers: minimum number of inliers in a handle\n";
+  std::cout << "  plot_mode: (0) none, (1) lines, (2) hands\n";
   
   return (-1);
 }

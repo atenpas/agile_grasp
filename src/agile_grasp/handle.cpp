@@ -54,6 +54,7 @@ void Handle::setGraspVariables()
 	center_ = hand_list_[inliers_[min_idx]].getGraspBottom();
 	approach_ = hand_list_[inliers_[min_idx]].getApproach();
 	hands_center_ = hand_list_[inliers_[min_idx]].getGraspSurface();
+	binormal_ = approach_.cross(axis_);
 //	std::cout << "center_: " << center_.transpose() << std::endl;
 //	std::cout << "approach_: " << approach_.transpose() << std::endl;
 //	std::cout << "axis_: " << axis_.transpose() << std::endl;

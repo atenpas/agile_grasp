@@ -1,6 +1,135 @@
 #include <agile_grasp/plot.h>
 
 
+void Plot::plotFingers(const std::vector<Handle>& handle_list, const PointCloud::Ptr& cloud,
+  std::string str, double outer_diameter, double hand_depth)
+{
+  const int WIDTH = pcl::visualization::PCL_VISUALIZER_LINE_WIDTH;
+
+  boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer = createViewer(str);
+
+  viewer->addPointCloud<pcl::PointXYZ>(cloud, "cloud");
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "cloud");
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0.0, 0.0, 1.0, "cloud");
+
+  std::vector<GraspHypothesis> hand_list;
+  std::vector<GraspHypothesis> center_hand_list;
+  for (int i = 0; i < handle_list.size(); i++)
+  {
+    const std::vector<int>& inliers = handle_list[i].getInliers();
+    const std::vector<GraspHypothesis>& hands = handle_list[i].getHandList();
+    GraspHypothesis center_hand(handle_list[i].getAxis(), handle_list[i].getApproach(), handle_list[i].getBinormal(),
+      handle_list[i].getCenter(), handle_list[i].getCenter(), 0.0, Eigen::Matrix3Xd::Zero(3,0), std::vector<int>(),
+      std::vector<int>(), 0);
+    center_hand_list.push_back(center_hand);
+
+    for (int j = 0; j < inliers.size(); j++)
+    {
+      hand_list.push_back(hands[inliers[j]]);
+    }
+  }
+
+  PointCloudRGBA::Ptr cloud_fingers(new PointCloudRGBA);
+  cloud_fingers = createFingersCloud(hand_list, outer_diameter, hand_depth);
+  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBA> rgb_fingers(cloud_fingers);
+  viewer->addPointCloud<pcl::PointXYZRGBA>(cloud_fingers, rgb_fingers, "fingers");
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "fingers");
+
+  PointCloudRGBA::Ptr center_cloud_fingers(new PointCloudRGBA);
+  center_cloud_fingers = createFingersCloud(center_hand_list, outer_diameter, hand_depth);
+  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBA> rgb_center_fingers(center_cloud_fingers);
+  viewer->addPointCloud<pcl::PointXYZRGBA>(center_cloud_fingers, rgb_center_fingers, "center_fingers");
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "center_fingers");
+
+  runViewer(viewer);
+}
+
+
+void Plot::plotFingers(const std::vector<GraspHypothesis>& hand_list, const PointCloud::Ptr& cloud,
+  std::string str, double outer_diameter, double hand_depth)
+{
+  const int WIDTH = pcl::visualization::PCL_VISUALIZER_LINE_WIDTH;
+
+  boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer = createViewer(str);
+
+  viewer->addPointCloud<pcl::PointXYZ>(cloud, "cloud");
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "cloud");
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0.0, 0.0, 1.0, "cloud");
+
+  PointCloudRGBA::Ptr cloud_fingers(new PointCloudRGBA);
+  cloud_fingers = createFingersCloud(hand_list, outer_diameter, hand_depth);
+
+  pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBA> rgb_fingers(cloud_fingers);
+  viewer->addPointCloud<pcl::PointXYZRGBA>(cloud_fingers, rgb_fingers, "fingers");
+  viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "fingers");
+
+  runViewer(viewer);
+}
+
+
+PointCloudRGBA::Ptr Plot::createFingersCloud(const std::vector<GraspHypothesis>& hand_list,
+  double outer_diameter, double hand_depth)
+{
+  PointCloudRGBA::Ptr cloud_fingers(new PointCloudRGBA);
+
+  for (int i = 0; i < hand_list.size(); i++)
+  {
+    Eigen::Vector3d bottom = hand_list[i].getGraspBottom() - hand_depth * hand_list[i].getApproach();
+    pcl::PointXYZRGBA pc = eigenVector3dToPointXYZRGBA(bottom);
+    setPointColor(hand_list[i], pc);
+
+    double width = outer_diameter;
+    double hw = 0.5 * width;
+    double step = hw / 30.0;
+    Eigen::Vector3d left_bottom = bottom + hw * hand_list[i].getBinormal();
+    Eigen::Vector3d right_bottom = bottom - hw * hand_list[i].getBinormal();
+    pcl::PointXYZRGBA p1 = eigenVector3dToPointXYZRGBA(left_bottom);
+    pcl::PointXYZRGBA p2 = eigenVector3dToPointXYZRGBA(right_bottom);
+    setPointColor(hand_list[i], p1);
+    setPointColor(hand_list[i], p2);
+    cloud_fingers->points.push_back(pc);
+    cloud_fingers->points.push_back(p1);
+    cloud_fingers->points.push_back(p2);
+
+    // Draw the hand base.
+    for (double j=step; j < hw; j+=step)
+    {
+      Eigen::Vector3d lb, rb, a;
+      lb = bottom + j * hand_list[i].getBinormal();
+      rb = bottom - j * hand_list[i].getBinormal();
+      a = bottom - j * hand_list[i].getApproach();
+      pcl::PointXYZRGBA plb = eigenVector3dToPointXYZRGBA(lb);
+      setPointColor(hand_list[i], plb);
+      pcl::PointXYZRGBA prb = eigenVector3dToPointXYZRGBA(rb);
+      setPointColor(hand_list[i], prb);
+      pcl::PointXYZRGBA pa = eigenVector3dToPointXYZRGBA(a);
+      setPointColor(hand_list[i], pa);
+      cloud_fingers->points.push_back(plb);
+      cloud_fingers->points.push_back(prb);
+      cloud_fingers->points.push_back(pa);
+    }
+
+    // Draw the fingers.
+    double dist = 0.06;
+    step = dist / 40.0;
+    for (double j=step; j < dist; j+=step)
+    {
+      Eigen::Vector3d lt, rt;
+      lt = left_bottom + j * hand_list[i].getApproach();
+      rt = right_bottom + j * hand_list[i].getApproach();
+      pcl::PointXYZRGBA plt = eigenVector3dToPointXYZRGBA(lt);
+      setPointColor(hand_list[i], plt);
+      pcl::PointXYZRGBA prt = eigenVector3dToPointXYZRGBA(rt);
+      setPointColor(hand_list[i], prt);
+      cloud_fingers->points.push_back(plt);
+      cloud_fingers->points.push_back(prt);
+    }
+  }
+
+  return cloud_fingers;
+}
+
+
 void Plot::plotHands(const std::vector<GraspHypothesis>& hand_list,
 	const std::vector<GraspHypothesis>& antipodal_hand_list, const PointCloud::Ptr& cloud, std::string str,
 	bool use_grasp_bottom)
@@ -403,4 +532,33 @@ visualization_msgs::Marker Plot::createMarker(const std::string& frame)
   marker.lifetime = ros::Duration(marker_lifetime_);
   marker.action = visualization_msgs::Marker::ADD;
   return marker;
+}
+
+
+void Plot::setPointColor(const GraspHypothesis& hand, pcl::PointXYZRGBA& p)
+{
+  p.a = 0.5;
+
+  if (hand.isFullAntipodal())
+  {
+    p.r = 0;
+    p.g = 255;
+    p.b = 0;
+  }
+  else
+  {
+    p.r = 255;
+    p.g = 0;
+    p.b = 0;
+  }
+}
+
+
+pcl::PointXYZRGBA Plot::eigenVector3dToPointXYZRGBA(const Eigen::Vector3d& v)
+{
+  pcl::PointXYZRGBA p;
+  p.x = v(0);
+  p.y = v(1);
+  p.z = v(2);
+  return p;
 }
