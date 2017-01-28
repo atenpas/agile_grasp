@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     //workspace << 0.55, 0.9, -0.35, 0.2, -0.2, 2;
     //workspace << 0.6, 0.8, -0.25, 0.1, -0.3, 2;
     // workspace << 0.55, 0.95, -0.25, 0.07, -0.3, 1;
-    workspace << -10, 10, -10, 10, -10, 10;
+    workspace << -10, 10, -10, 10, -10, 1;
     // workspace << -10, 10, -10, 10, 0.55, 0.95;
 
 		// set-up parameters for the hand search
@@ -100,9 +100,11 @@ int main(int argc, char** argv)
   }
 
   std::cout << "No PCD filename given!\n";
-  std::cout << "Usage: test_svm pcd_filename svm_filename [num_samples] [num_threads] [min_handle_inliers] [plot_mode]\n";
+  std::cout << "Usage: test_svm pcd_filepath svm_filepath [num_samples] [num_threads] [min_handle_inliers] [plot_mode]\n";
   std::cout << "Localize grasps in a *.pcd file using a trained SVM.\n";
   std::cout << "Parameters:\n";
+  std::cout << "  pcd_filepath: path to a point cloud file (*.pcd)\n";
+  std::cout << "  svm_filepath: path to a SVM file\n";
   std::cout << "  num_samples: number of samples to draw from the point cloud\n";
   std::cout << "  num_threads: number of CPU threads to use\n";
   std::cout << "  min_handle_inliers: minimum number of inliers in a handle\n";

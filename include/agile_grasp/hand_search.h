@@ -46,7 +46,8 @@
 #include <agile_grasp/rotating_hand.h>
 
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloud;
+
 
 /** HandSearch class
  *
@@ -114,7 +115,7 @@ class HandSearch
 		 * \return a list of quadratic surfaces
 		*/
     std::vector<Quadric> findQuadrics(const PointCloud::Ptr cloud, const Eigen::VectorXi& pts_cam_source,
-			const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree, const std::vector<int>& indices);
+			const pcl::KdTreeFLANN<pcl::PointXYZRGBA>& kdtree, const std::vector<int>& indices);
 		
 		/**
 		 * \brief Find grasp hypotheses in a point cloud given a list of quadratic surfaces.
@@ -127,7 +128,7 @@ class HandSearch
 		*/
     std::vector<GraspHypothesis> findHands(const PointCloud::Ptr cloud, const Eigen::VectorXi& pts_cam_source,
 			const std::vector<Quadric>& quadric_list, const Eigen::VectorXi& hands_cam_source, 
-      const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree);
+      const pcl::KdTreeFLANN<pcl::PointXYZRGBA>& kdtree);
     
     Eigen::Matrix4d cam_tf_left_, cam_tf_right_; ///< camera poses
     

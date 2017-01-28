@@ -38,10 +38,15 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <vector>
 
+
 /** Lapack function to solve the generalized eigenvalue problem */
 extern "C" void dggev_(const char* JOBVL, const char* JOBVR, const int* N, const double* A, const int* LDA,
                        const double* B, const int* LDB, double* ALPHAR, double* ALPHAI, double* BETA, double* VL,
                        const int* LDVL, double* VR, const int* LDVR, double* WORK, const int* LWORK, int* INFO);
+
+
+typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloud;
+
 
 /** Quadric class
  *
@@ -71,7 +76,7 @@ public:
 	 * \param is_deterministic_ whether the local axes estimation is deterministic
 	*/
   Quadric(const std::vector<Eigen::Matrix4d, Eigen::aligned_allocator<Eigen::Matrix4d> >& T_cams,
-          const pcl::PointCloud<pcl::PointXYZ>::Ptr& input, const Eigen::Vector3d& sample, bool is_deterministic);
+          const PointCloud::Ptr& input, const Eigen::Vector3d& sample, bool is_deterministic);
   
   /**
 	 * \brief Estimate the local axes for the quadric fitted to the point neighborhood.
@@ -90,7 +95,7 @@ public:
 	 * \brief Set the input point cloud.
 	 * \param input the input point cloud
 	*/
-	void setInputCloud(const pcl::PointCloud<pcl::PointXYZ>::Ptr& input)
+	void setInputCloud(const PointCloud::Ptr& input)
 	{
 		this->input_ = input;
 	}
@@ -174,7 +179,7 @@ private:
   Eigen::Matrix3Xd cam_origins_; ///< the camera positions
   Eigen::Vector3d sample_; ///< the sample for which the point neighborhood was found
   int majority_cam_source_; ///< the majority camera source
-  pcl::PointCloud<pcl::PointXYZ>::Ptr input_; ///< the input point cloud
+  PointCloud::Ptr input_; ///< the input point cloud
   Eigen::Vector3d curvature_axis_, normal_, binormal_; ///< the curvature, normal, and binormal axis
   Eigen::Matrix<double, 10, 1> parameters_; ///< the parameters of the quadric (implicit form)
   Eigen::Vector3d centroid_; ///< the centroid of the quadric

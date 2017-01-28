@@ -7,7 +7,7 @@ std::vector<GraspHypothesis> HandSearch::findHands(const PointCloud::Ptr cloud,
   bool uses_clustering)
 {
   // create KdTree for neighborhood search
-	pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+	pcl::KdTreeFLANN<pcl::PointXYZRGBA> kdtree;
 	kdtree.setInputCloud(cloud);
 
 	cloud_normals_.resize(3, cloud->size());
@@ -33,7 +33,7 @@ std::vector<GraspHypothesis> HandSearch::findHands(const PointCloud::Ptr cloud,
 		double t_rand = omp_get_wtime();
 		std::cout << "Generating uniform random indices ...\n";
 		indices_rand.resize(num_samples_);
-		pcl::RandomSample<pcl::PointXYZ> random_sample;
+		pcl::RandomSample<pcl::PointXYZRGBA> random_sample;
 		random_sample.setInputCloud(cloud);
 		random_sample.setSample(num_samples_);
 		random_sample.filter(indices_rand);
@@ -63,7 +63,7 @@ std::vector<GraspHypothesis> HandSearch::findHands(const PointCloud::Ptr cloud,
 
 
 std::vector<Quadric> HandSearch::findQuadrics(const PointCloud::Ptr cloud,
-	const Eigen::VectorXi& pts_cam_source, const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree,
+	const Eigen::VectorXi& pts_cam_source, const pcl::KdTreeFLANN<pcl::PointXYZRGBA>& kdtree,
 	const std::vector<int>& indices)
 {
 	double t1 = omp_get_wtime();
@@ -79,7 +79,7 @@ std::vector<Quadric> HandSearch::findQuadrics(const PointCloud::Ptr cloud,
 #endif
 	for (int i = 0; i < indices.size(); i++)
 	{
-		const pcl::PointXYZ& sample = cloud->points[indices[i]];
+		const pcl::PointXYZRGBA& sample = cloud->points[indices[i]];
 //    std::cout << "i: " << i << ", index: " << indices[i] << ", sample: " << sample << std::endl;
 
 		if (kdtree.radiusSearch(sample, nn_radius_taubin_, nn_indices, nn_dists) > 0)
@@ -115,7 +115,7 @@ std::vector<Quadric> HandSearch::findQuadrics(const PointCloud::Ptr cloud,
 
 std::vector<GraspHypothesis> HandSearch::findHands(const PointCloud::Ptr cloud,
 	const Eigen::VectorXi& pts_cam_source, const std::vector<Quadric>& quadric_list,
-	const Eigen::VectorXi& hands_cam_source, const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree)
+	const Eigen::VectorXi& hands_cam_source, const pcl::KdTreeFLANN<pcl::PointXYZRGBA>& kdtree)
 {
 	double t1 = omp_get_wtime();
 	std::vector<int> nn_indices;
@@ -138,7 +138,7 @@ std::vector<GraspHypothesis> HandSearch::findHands(const PointCloud::Ptr cloud,
 	for (std::size_t i = 0; i < quadric_list.size(); i++)
 	{
 		double timei = omp_get_wtime();
-		pcl::PointXYZ sample;
+		pcl::PointXYZRGBA sample;
 		sample.x = quadric_list[i].getSample()(0);
 		sample.y = quadric_list[i].getSample()(1);
 		sample.z = quadric_list[i].getSample()(2);

@@ -8,7 +8,7 @@
 #include <pcl/search/organized.h>
 #include <pcl/kdtree/kdtree_flann.h>
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloud;
 
 int main(int argc, char** argv)
 {
@@ -18,17 +18,17 @@ int main(int argc, char** argv)
 //  std::string file = "/home/andreas/data/mlaffordance/round21l_reg.pcd";
   std::string file = "/home/andreas/data/mlaffordance/training/rect31l_reg.pcd";
   PointCloud::Ptr cloud(new PointCloud);
-  if (pcl::io::loadPCDFile<pcl::PointXYZ>(file, *cloud) == -1) //* load the file
+  if (pcl::io::loadPCDFile<pcl::PointXYZRGBA>(file, *cloud) == -1) //* load the file
   {
     PCL_ERROR("Couldn't read input PCD file\n");
     return (-1);
   }
   
-  pcl::search::OrganizedNeighbor<pcl::PointXYZ>::Ptr organized_neighbor(
-    new pcl::search::OrganizedNeighbor<pcl::PointXYZ>());
+  pcl::search::OrganizedNeighbor<pcl::PointXYZRGBA>::Ptr organized_neighbor(
+    new pcl::search::OrganizedNeighbor<pcl::PointXYZRGBA>());
   std::vector<int> nn_indices;
   std::vector<float> nn_dists;
-  pcl::KdTreeFLANN<pcl::PointXYZ>::Ptr tree(new pcl::KdTreeFLANN<pcl::PointXYZ>());
+  pcl::KdTreeFLANN<pcl::PointXYZRGBA>::Ptr tree(new pcl::KdTreeFLANN<pcl::PointXYZRGBA>());
 
 //  int sample_index = 0;
   int sample_index = 731;

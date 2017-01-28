@@ -1,7 +1,7 @@
 #include <agile_grasp/quadric.h>
 
 Quadric::Quadric(const std::vector<Eigen::Matrix4d, Eigen::aligned_allocator<Eigen::Matrix4d> >& T_cams,
-		const pcl::PointCloud<pcl::PointXYZ>::Ptr& input, const Eigen::Vector3d& sample, bool is_deterministic) :
+  const PointCloud::Ptr& input, const Eigen::Vector3d& sample, bool is_deterministic) :
 		input_(input), sample_(sample), is_deterministic_(is_deterministic)
 {
 	cam_origins_.resize(3, T_cams.size());

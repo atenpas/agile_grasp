@@ -53,7 +53,7 @@
 #include <agile_grasp/rotating_hand.h>
 
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloud;
 
 /** GraspLocalizer class
  *

@@ -44,7 +44,7 @@
 #include <agile_grasp/handle.h>
 
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloud;
 
 /** HandleSearch class
  *

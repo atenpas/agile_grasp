@@ -54,7 +54,7 @@
 #include <agile_grasp/learning.h>
 #include <agile_grasp/plot.h>
 
-typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloud;
 
 
 /** Localization class

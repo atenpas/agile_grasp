@@ -53,10 +53,10 @@ std::vector<GraspHypothesis> Localization::localizeHands(const PointCloud::Ptr& 
     std::cout << "Finding point cloud clusters ... \n";
         
 		// Create the segmentation object for the planar model and set all the parameters
-		pcl::SACSegmentation<pcl::PointXYZ> seg;
+		pcl::SACSegmentation<pcl::PointXYZRGBA> seg;
 		pcl::PointIndices::Ptr inliers(new pcl::PointIndices);
 		pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
-		pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_plane(new pcl::PointCloud<pcl::PointXYZ>());
+		pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud_plane(new pcl::PointCloud<pcl::PointXYZRGBA>());
 		seg.setOptimizeCoefficients(true);
 		seg.setModelType(pcl::SACMODEL_PLANE);
 		seg.setMethodType(pcl::SAC_RANSAC);
@@ -77,7 +77,7 @@ std::vector<GraspHypothesis> Localization::localizeHands(const PointCloud::Ptr& 
       << " data points." << std::endl;
 
 		// Extract the nonplanar inliers
-		pcl::ExtractIndices<pcl::PointXYZ> extract;
+		pcl::ExtractIndices<pcl::PointXYZRGBA> extract;
 		extract.setInputCloud(cloud);
 		extract.setIndices(inliers);
 		extract.setNegative(true);
@@ -181,9 +181,9 @@ std::vector<GraspHypothesis> Localization::localizeHands(const std::string& pcd_
 
 	// load point clouds
 	PointCloud::Ptr cloud_left(new PointCloud);
-	if (pcl::io::loadPCDFile<pcl::PointXYZ>(pcd_filename_left, *cloud_left) == -1) //* load the file
+	if (pcl::io::loadPCDFile<pcl::PointXYZRGBA>(pcd_filename_left, *cloud_left) == -1) //* load the file
 	{
-		PCL_ERROR("Couldn't read pcd_filename_left file \n");
+		std::cout << "Couldn't read pcd_filename_left file: " << pcd_filename_left << " \n";
 		std::vector<GraspHypothesis> hand_list(0);
 		return hand_list;
 	}
@@ -195,9 +195,9 @@ std::vector<GraspHypothesis> Localization::localizeHands(const std::string& pcd_
 	PointCloud::Ptr cloud_right(new PointCloud);
 	if (pcd_filename_right.length() > 0)
 	{
-		if (pcl::io::loadPCDFile<pcl::PointXYZ>(pcd_filename_right, *cloud_right) == -1) //* load the file
+		if (pcl::io::loadPCDFile<pcl::PointXYZRGBA>(pcd_filename_right, *cloud_right) == -1) //* load the file
 		{
-			PCL_ERROR("Couldn't read pcd_filename_right file \n");
+		  std::cout << "Couldn't read pcd_filename_left file: " << pcd_filename_right << " \n";
 			std::vector<GraspHypothesis> hand_list(0);
 			return hand_list;
 		}
@@ -224,7 +224,7 @@ void Localization::filterWorkspace(const PointCloud::Ptr& cloud_in, const Eigen:
 	for (int i = 0; i < cloud_in->points.size(); i++)
 	{
 //    std::cout << "i: " << i << "\n";
-		const pcl::PointXYZ& p = cloud_in->points[i];
+		const pcl::PointXYZRGBA& p = cloud_in->points[i];
 		if (p.x >= workspace_(0) && p.x <= workspace_(1) && p.y >= workspace_(2) && p.y <= workspace_(3)
 				&& p.z >= workspace_(4) && p.z <= workspace_(5))
 		{
@@ -333,7 +333,7 @@ void Localization::voxelizeCloud(const PointCloud::Ptr& cloud_in, const Eigen::V
 	Eigen::VectorXi pts_cam_source(bins_left.size() + bins_right.size());
 	for (int i = 0; i < bins_left.size(); i++)
 	{
-		pcl::PointXYZ p;
+		pcl::PointXYZRGBA p;
 		p.x = voxels_left(0, i);
 		p.y = voxels_left(1, i);
 		p.z = voxels_left(2, i);
@@ -342,7 +342,7 @@ void Localization::voxelizeCloud(const PointCloud::Ptr& cloud_in, const Eigen::V
 	}
 	for (int i = 0; i < bins_right.size(); i++)
 	{
-		pcl::PointXYZ p;
+		pcl::PointXYZRGBA p;
 		p.x = voxels_right(0, i);
 		p.y = voxels_right(1, i);
 		p.z = voxels_right(2, i);
