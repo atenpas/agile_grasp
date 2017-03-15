@@ -37,8 +37,10 @@ GraspLocalizer::GraspLocalizer(ros::NodeHandle& node, const std::string& cloud_t
 	else
 	{
 		plots_handles_ = false;		
-		if (params.plotting_mode_ == 2)
+		if (params.plotting_mode_ == Localization::RVIZ_PLOTTING)
+		{
 			localization_->createVisualsPub(node, params.marker_lifetime_, cloud_frame_);
+		}
 	}
 }
 

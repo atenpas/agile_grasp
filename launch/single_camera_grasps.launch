@@ -13,7 +13,7 @@
               0, 0.895323, -0.445417, 0.23, 
               0, 0, 0, 1] </rosparam>
     <param name="min_inliers" value="10" />
-    <param name="plotting" value="2" />
-    <param name="marker_lifetime" value="5" />
+    <param name="plotting" value="2" /> <!-- 0: none, 1: PCL, 2: PCL with fingers, 3: rviz -->
+    <param name="marker_lifetime" value="30" />
 	</node>
 </launch>
