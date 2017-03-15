@@ -180,7 +180,6 @@ private:
   int num_clouds_; ///< the maximum number of point clouds that can be received
   int size_left_; ///< the size of the first point cloud
   int min_inliers_; ///< the minimum number of inliers for the handle search
-  bool plots_handles_; ///< whether handles are plotted
   
   /** constants for input point cloud types */
 	static const int POINT_CLOUD_2 = 0; ///< sensor_msgs/PointCloud2

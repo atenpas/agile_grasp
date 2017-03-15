@@ -20,7 +20,7 @@ const double WORKSPACE[6] = {-1.0, 1.0, -1.0, 1.0, -1.0, 1.0};
 const int MIN_HANDLE_INLIERS = 3;
 const int CLOUD_TYPE = 0;
 const std::string CLOUD_TYPES[2] = {"sensor_msgs/PointCloud2", "grasp_affordances/CloudSized"};
-const std::string PLOT_MODES[3] = {"none", "pcl", "rviz"};
+const std::string PLOT_MODES[4] = {"none", "PCL", "PCL with fingers", "rviz"};
 
 
 int main(int argc, char** argv)
