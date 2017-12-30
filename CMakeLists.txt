@@ -4,13 +4,26 @@ project(agile_grasp)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS cmake_modules cv_bridge eigen_conversions geometry_msgs 
-message_generation pcl_conversions roscpp sensor_msgs std_msgs visualization_msgs)
+find_package(catkin REQUIRED COMPONENTS eigen_conversions geometry_msgs
+message_generation pcl_conversions roscpp sensor_msgs std_msgs visualization_msgs tf_conversions)
+
+# Special handling for Eigen, which is different between Indigo and Jade/Kinetic.
+# This should work for both:
+#   http://wiki.ros.org/jade/Migration#Eigen_CMake_Module_in_cmake_modules
+find_package(Eigen3)
+if(NOT EIGEN3_FOUND)
+  # Fallback to cmake_modules
+  find_package(cmake_modules REQUIRED)
+  find_package(Eigen REQUIRED)
+  set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})
+else()
+  set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
+endif()
+
 
 ## System dependencies are found with CMake's conventions
-find_package(Eigen REQUIRED)
 find_package(LAPACK REQUIRED)
-find_package(OpenCV)
+find_package(OpenCV 2 REQUIRED)
 find_package(PCL REQUIRED)
 #~ find_package(VTK 6.0 REQUIRED NO_MODULE) # required in Fedora Core
 
@@ -83,7 +96,6 @@ catkin_package(
   hand_search
  CATKIN_DEPENDS
 	cmake_modules
-	cv_bridge
   eigen_conversions 
   geometry_msgs 
   message_runtime 
@@ -93,7 +105,6 @@ catkin_package(
   std_msgs
   visualization_msgs
  DEPENDS 
-  Eigen
   LAPACK
   OpenCV
   PCL  
@@ -105,7 +116,11 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+include_directories(include
+  ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS})
 #~ include(${VTK_USE_FILE}) # required in Fedora Core
 
 ## Declare a cpp library
