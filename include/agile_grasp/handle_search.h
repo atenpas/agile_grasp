@@ -43,98 +43,93 @@
 #include <agile_grasp/grasp_hypothesis.h>
 #include <agile_grasp/handle.h>
 
-
 typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloud;
 
 /** HandleSearch class
  *
  * \brief Search handles given grasp hypotheses
- * 
- * This class searches for handles, i.e., clusters of grasps that are geometrically aligned. It can 
+ *
+ * This class searches for handles, i.e., clusters of grasps that are
+ * geometrically aligned. It can
  * also plot the results of this search.
- * 
+ *
 */
-class HandleSearch
-{
-public:
-		
-	/**
-	 * \brief Search for handles given a list of grasp hypotheses.
-	 * \param hand_list the list of grasp hypotheses
-	 * \param min_inliers the minimum number of grasp hypothesis contained in a handle
-	 * \param min_length the minimum length of a handle
-	 * \return the list of handles found
-	*/
-	std::vector<Handle> findHandles(const std::vector<GraspHypothesis>& hand_list, int min_inliers, double min_length);
+class HandleSearch {
+ public:
+  /**
+   * \brief Search for handles given a list of grasp hypotheses.
+   * \param hand_list the list of grasp hypotheses
+   * \param min_inliers the minimum number of grasp hypothesis contained in a
+   * handle
+   * \param min_length the minimum length of a handle
+   * \return the list of handles found
+  */
+  std::vector<Handle> findHandles(const std::vector<GraspHypothesis>& hand_list,
+                                  int min_inliers, double min_length);
 
+ private:
+  /**
+   * \brief Shorten a handle to a continuous piece.
+   *
+   * This function finds continuous handles by searching for a gap that is
+   * larger than @p gap_threshold.
+   *
+   * \param inliers the list of grasp hypotheses that are part of the handle to
+   * be shortened
+   * \param gap_threshold the maximum gap size
+   * \return the shortened handle
+  */
+  bool shortenHandle(std::vector<Eigen::Vector2d>& inliers,
+                     double gap_threshold);
 
-private:
-	
-	/**
-	 * \brief Shorten a handle to a continuous piece.
-	 * 
-	 * This function finds continuous handles by searching for a gap that is larger than @p gap_threshold.
-	 * 
-	 * \param inliers the list of grasp hypotheses that are part of the handle to be shortened
-	 * \param gap_threshold the maximum gap size
-	 * \return the shortened handle
-	*/
-	bool shortenHandle(std::vector<Eigen::Vector2d> &inliers, double gap_threshold);
-	
-	/**
-	 * \brief Safe version of the acos(x) function.
-	 * \param x the value whose arc cosine is computed
-	 * \return the arc cosine of x, expressed in radians
-	*/
-	double safeAcos(double x);
-	
-	/**
-	 * \brief Comparator for equality of the first two elements of two 3D-vectors.
-	*/ 
-	struct VectorFirstTwoElementsComparator
-	{
-		/**
-		 * \brief Compare the first two elements of two 3D-vectors for equality.
-	   * \param a the first 3D-vector to be compared
-	   * \param b the second 3D-vector to be compared
-	   * \return true if the first element of both vectors is equal or the second element of both 
-	   * vectors is equal, false otherwise
-		*/
-		bool operator ()(const Eigen::Vector3d& a, const Eigen::Vector3d& b)
-		{
-			for (int i = 0; i < 2; i++)
-			{
-				if (a(i) != b(i))
-				{
-					return a(i) < b(i);
-				}
-			}
+  /**
+   * \brief Safe version of the acos(x) function.
+   * \param x the value whose arc cosine is computed
+   * \return the arc cosine of x, expressed in radians
+  */
+  double safeAcos(double x);
 
-			return false;
-		}
-	};
-	
-	/**
-	 * \brief Comparator for equality of the last element of two 2D-vectors.
-	*/ 
-	struct LastElementComparator
-	{
-		/**
-		 * \brief Compare the last element of two 2D-vectors for equality.
-	   * \param a the first 2D-vector to be compared
-	   * \param b the second 2D-vector to be compared
-	   * \return true if the last element of both vectors is equal, false otherwise
-		*/
-		bool operator ()(const Eigen::Vector2d& a, const Eigen::Vector2d& b)
-		{
-			if (a(1) != b(1))
-			{
-				return a(1) < b(1);
-			}
+  /**
+   * \brief Comparator for equality of the first two elements of two 3D-vectors.
+  */
+  struct VectorFirstTwoElementsComparator {
+    /**
+     * \brief Compare the first two elements of two 3D-vectors for equality.
+*\param a the first 3D-vector to be compared
+*\param b the second 3D-vector to be compared
+*\return true if the first element of both vectors is equal or the second
+* element of both
+*vectors is equal, false otherwise
+    */
+    bool operator()(const Eigen::Vector3d& a, const Eigen::Vector3d& b) {
+      for (int i = 0; i < 2; i++) {
+        if (a(i) != b(i)) {
+          return a(i) < b(i);
+        }
+      }
 
-			return false;
-		}
-	};
+      return false;
+    }
+  };
+
+  /**
+   * \brief Comparator for equality of the last element of two 2D-vectors.
+  */
+  struct LastElementComparator {
+    /**
+     * \brief Compare the last element of two 2D-vectors for equality.
+*\param a the first 2D-vector to be compared
+*\param b the second 2D-vector to be compared
+*\return true if the last element of both vectors is equal, false otherwise
+    */
+    bool operator()(const Eigen::Vector2d& a, const Eigen::Vector2d& b) {
+      if (a(1) != b(1)) {
+        return a(1) < b(1);
+      }
+
+      return false;
+    }
+  };
 };
 
 #endif /* HANDLE_SEARCH_H_ */

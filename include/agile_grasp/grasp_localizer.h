@@ -52,138 +52,151 @@
 #include <agile_grasp/localization.h>
 #include <agile_grasp/rotating_hand.h>
 
-
 typedef pcl::PointCloud<pcl::PointXYZRGBA> PointCloud;
 
 /** GraspLocalizer class
  *
  * \brief Repeatedly search for antipodal grasps in point clouds.
- * 
- * This class is a ROS node that repeatedly takes a point cloud from a given ROS topic as input, 
- * searches for antipodal grasps in that cloud, and publishes the results on a ROS topic. Incoming 
- * point cloud messages can be of two different types: (1) standard sensor_msgs/PointCloud2, (2) 
- * agile_grasp/CloudSized messages. The second type is for two point clouds send in the same 
+ *
+ * This class is a ROS node that repeatedly takes a point cloud from a given ROS
+ * topic as input,
+ * searches for antipodal grasps in that cloud, and publishes the results on a
+ * ROS topic. Incoming
+ * point cloud messages can be of two different types: (1) standard
+ * sensor_msgs/PointCloud2, (2)
+ * agile_grasp/CloudSized messages. The second type is for two point clouds send
+ * in the same
  * message (see msg/CloudSized.msg or rosmsg agile_grasp/CloudSized).
- * 
+ *
 */
-class GraspLocalizer
-{
-public:
-
+class GraspLocalizer {
+ public:
   /**
    * \brief Parameters for hand search and handle search.
   */
-  struct Parameters
-  {
+  struct Parameters {
     /** hand search parameters */
     int num_threads_;
     int num_samples_;
-    int num_clouds_;    
+    int num_clouds_;
     Eigen::Matrix4d cam_tf_left_;
     Eigen::Matrix4d cam_tf_right_;
     Eigen::VectorXd workspace_;
-    
+
     /** hand geometry parameters */
     double finger_width_;
     double hand_outer_diameter_;
     double hand_depth_;
     double hand_height_;
     double init_bite_;
-        
+
     // handle search parameters
     int min_inliers_;
-    
+
     // visualization parameters
-		int plotting_mode_;
-		double marker_lifetime_;
+    int plotting_mode_;
+    double marker_lifetime_;
   };
-  
+
   /**
-	 * \brief Constructor.
-	 * \param node the ROS node
-	 * \param cloud_topic the ROS topic that contains the input point cloud
-	 * \param cloud_frame the coordinate frame of the point cloud
-	 * \param cloud_type the type of the point cloud message (see constants for input point cloud types)
-	 * \param svm_file_name the location and filename of the SVM
-	 * \param params a set of parameters for hand search and handle search
-	*/
-  GraspLocalizer(ros::NodeHandle& node, const std::string& cloud_topic, 
-    const std::string& cloud_frame, int cloud_type, const std::string& svm_file_name,  
-    const Parameters& params);
-  
+         * \brief Constructor.
+         * \param node the ROS node
+         * \param cloud_topic the ROS topic that contains the input point cloud
+         * \param cloud_frame the coordinate frame of the point cloud
+         * \param cloud_type the type of the point cloud message (see constants
+   * for input point cloud types)
+         * \param svm_file_name the location and filename of the SVM
+         * \param params a set of parameters for hand search and handle search
+        */
+  GraspLocalizer(ros::NodeHandle& node, const std::string& cloud_topic,
+                 const std::string& cloud_frame, int cloud_type,
+                 const std::string& svm_file_name, const Parameters& params);
+
   /**
    * \brief Destructor.
   */
   ~GraspLocalizer() { delete localization_; }
-  
+
   /**
    * \brief Repeatedly localize grasps in the input point cloud.
   */
   void localizeGrasps();
 
-private:
-	
-	/**
-	 * \brief Callback function for the ROS topic that contains the input point cloud.
-	 * \param msg the incoming ROS message (of type sensor_msgs/PointCloud2)
-	*/
+ private:
+  /**
+   * \brief Callback function for the ROS topic that contains the input point
+   * cloud.
+   * \param msg the incoming ROS message (of type sensor_msgs/PointCloud2)
+  */
   void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& msg);
-  
+
   /**
-	 * \brief Callback function for the ROS topic that contains the input point cloud.
-	 * \param msg the incoming ROS message (of type agile_grasp/CloudSized)
-	*/
+         * \brief Callback function for the ROS topic that contains the input
+   * point cloud.
+         * \param msg the incoming ROS message (of type agile_grasp/CloudSized)
+        */
   void cloud_sized_callback(const agile_grasp::CloudSized& msg);
-  
+
   /**
-	 * \brief Create a grasps message from a list of handles. The message consists of all the grasps 
-	 * contained in the handles.
-	 * \param handles the set of handles from which the grasps message is created
-	*/
-  agile_grasp::Grasps createGraspsMsgFromHands(const std::vector<Handle>& handles);
-  
+         * \brief Create a grasps message from a list of handles. The message
+   * consists of all the grasps
+         * contained in the handles.
+         * \param handles the set of handles from which the grasps message is
+   * created
+        */
+  agile_grasp::Grasps createGraspsMsgFromHands(
+      const std::vector<Handle>& handles);
+
   /**
-	 * \brief Create a grasps message from a list of handles. The message consists of the "average" 
-	 * handle grasps.
-	 * \param handles the set of handles from which the grasps message is created
-	*/
+         * \brief Create a grasps message from a list of handles. The message
+   * consists of the "average"
+         * handle grasps.
+         * \param handles the set of handles from which the grasps message is
+   * created
+        */
   agile_grasp::Grasps createGraspsMsg(const std::vector<Handle>& handles);
-  
+
   /**
-	 * \brief Create a grasp message from a handle.
-	 * \param handles the handle from which the grasp message is created
-	*/
+         * \brief Create a grasp message from a handle.
+         * \param handles the handle from which the grasp message is created
+        */
   agile_grasp::Grasp createGraspMsg(const Handle& handle);
-  
+
   /**
-	 * \brief Create a grasp message from a list of grasp hypotheses.
-	 * \param hands the set of grasp hypotheses from which the grasps message is created
-	*/
-  agile_grasp::Grasps createGraspsMsg(const std::vector<GraspHypothesis>& hands);
-  
+         * \brief Create a grasp message from a list of grasp hypotheses.
+         * \param hands the set of grasp hypotheses from which the grasps
+   * message is created
+        */
+  agile_grasp::Grasps createGraspsMsg(
+      const std::vector<GraspHypothesis>& hands);
+
   /**
-	 * \brief Create a grasp message from a grasp hypothesis.
-	 * \param hand the grasp hypothesis from which the grasp message is created
-	*/
+         * \brief Create a grasp message from a grasp hypothesis.
+         * \param hand the grasp hypothesis from which the grasp message is
+   * created
+        */
   agile_grasp::Grasp createGraspMsg(const GraspHypothesis& hand);
-  
-  std::string svm_file_name_; ///< the location and filename of the SVM
-  std::string cloud_frame_; ///< the coordinate frame of the point cloud
-  PointCloud::Ptr cloud_left_, cloud_right_; ///< the point clouds
-  ros::Subscriber cloud_sub_; ///< the subscriber for the point cloud topic
-  ros::Publisher grasps_pub_; ///< the publisher for the antipodal grasps
-  Localization* localization_; ///< a pointer to a localization object
-  std::vector<GraspHypothesis> hands_; ///< the grasp hypotheses found by the hand search
-  std::vector<GraspHypothesis> antipodal_hands_; ///< the antipodal grasps predicted by the SVM
-  std::vector<Handle> handles_; ///< the handles found by the handle search
-  int num_clouds_received_; ///< the number of point clouds that have been received
-  int num_clouds_; ///< the maximum number of point clouds that can be received
-  int size_left_; ///< the size of the first point cloud
-  int min_inliers_; ///< the minimum number of inliers for the handle search
-  
+
+  std::string svm_file_name_;  ///< the location and filename of the SVM
+  std::string cloud_frame_;    ///< the coordinate frame of the point cloud
+  PointCloud::Ptr cloud_left_, cloud_right_;  ///< the point clouds
+  ros::Subscriber cloud_sub_;   ///< the subscriber for the point cloud topic
+  ros::Publisher grasps_pub_;   ///< the publisher for the antipodal grasps
+  Localization* localization_;  ///< a pointer to a localization object
+  std::vector<GraspHypothesis>
+      hands_;  ///< the grasp hypotheses found by the hand search
+  std::vector<GraspHypothesis>
+      antipodal_hands_;          ///< the antipodal grasps predicted by the SVM
+  std::vector<Handle> handles_;  ///< the handles found by the handle search
+  int num_clouds_received_;      ///< the number of point clouds that have been
+                                 ///received
+  int num_clouds_;  ///< the maximum number of point clouds that can be received
+  int size_left_;   ///< the size of the first point cloud
+  int min_inliers_;  ///< the minimum number of inliers for the handle search
+
   /** constants for input point cloud types */
-	static const int POINT_CLOUD_2 = 0; ///< sensor_msgs/PointCloud2
-	static const int CLOUD_SIZED = 1; ///< agile_grasp/CloudSized
+  static const int POINT_CLOUD_2 = 0;  ///< sensor_msgs/PointCloud2
+  static const int CLOUD_SIZED = 1;    ///< agile_grasp/CloudSized
 };
 
 #endif /* GRASP_LOCALIZER_H_ */

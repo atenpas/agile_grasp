@@ -41,120 +41,103 @@
 /** HandleSearch class
  *
  * \brief Handle data structure
- * 
- * This class stores a single handle. The handle represents (a) a list of grasp hypotheses that 
- * are part of the handle, and (b) a grasp that is an "average" grasp over these grasp hypotheses.
- * 
+ *
+ * This class stores a single handle. The handle represents (a) a list of grasp
+ * hypotheses that
+ * are part of the handle, and (b) a grasp that is an "average" grasp over these
+ * grasp hypotheses.
+ *
 */
-class Handle
-{
-public:
-	
-	/**
-	 * \brief Constructor.
-	 * \param hand_list the list of grasp hypotheses
-	 * \param indices the list of indices of grasp hypotheses that are part of the handle
-	*/
-	Handle(const std::vector<GraspHypothesis>& hand_list, const std::vector<int>& inliers);
-	
-	/**
-	 * \brief Return the handle's approach vector.
-	 * \return the 3x1 handle approach vector
-	*/
-	const Eigen::Vector3d& getApproach() const
-	{
-		return approach_;
-	}
-	
-	/**
-	 * \brief Return the handle's axis.
-	 * \return the 3x1 handle axis
-	*/
-	const Eigen::Vector3d& getAxis() const
-	{
-		return axis_;
-	}
+class Handle {
+ public:
+  /**
+   * \brief Constructor.
+   * \param hand_list the list of grasp hypotheses
+   * \param indices the list of indices of grasp hypotheses that are part of the
+   * handle
+  */
+  Handle(const std::vector<GraspHypothesis>& hand_list,
+         const std::vector<int>& inliers);
 
-	/**
-	 * \brief Return the centroid of the handle.
-	 * \return the 3x1 handle centroid
-	*/
-	const Eigen::Vector3d& getCenter() const
-	{
-		return center_;
-	}
-	
-	/**
-	 * \brief Return the handle's grasp surface position.
-	 * \return the 3x1 grasp position
-	*/
-	const Eigen::Vector3d& getHandsCenter() const
-	{
-		return hands_center_;
-	}
-	
-	/**
-	 * \brief Return the width of the object contained in the handle grasp.
-	 * \return the width of the contained object
-	*/
-	double getWidth() const
-	{
-		return width_;
-	}
-	
-	/**
-	 * \brief Return the list of grasp hypotheses.
-	 * \return the list of grasp hypotheses
-	*/
-	const std::vector<GraspHypothesis>& getHandList() const
-	{
-		return hand_list_;
-	}
-	
-	/**
-	 * \brief Return the list of indices of grasp hypotheses that are part of the handle.
-	 * \return the list of indices of grasp hypotheses that are part of the handle
-	*/
-	const std::vector<int>& getInliers() const
-	{
-		return inliers_;
-	}
+  /**
+   * \brief Return the handle's approach vector.
+   * \return the 3x1 handle approach vector
+  */
+  const Eigen::Vector3d& getApproach() const { return approach_; }
 
-  const Eigen::Vector3d& getBinormal() const {
-    return binormal_;
-  }
+  /**
+   * \brief Return the handle's axis.
+   * \return the 3x1 handle axis
+  */
+  const Eigen::Vector3d& getAxis() const { return axis_; }
 
-private:
-	
-	/**
-	 * \brief Set the variables of the grasp.
-	*/
-	void setGraspVariables();
-	
-	/**
-	 * \brief Set the hand axis of the grasp.
-	*/
-	void setAxis();
+  /**
+   * \brief Return the centroid of the handle.
+   * \return the 3x1 handle centroid
+  */
+  const Eigen::Vector3d& getCenter() const { return center_; }
 
-	/**
-	 * \brief Set the distance along the handle's axis for each grasp hypothesis.
-	*/
-	void setDistAlongHandle();
-	
-	/**
-	 * \brief Set the width of the object contained in the handle grasp.
-	*/
-	void setGraspWidth();
+  /**
+   * \brief Return the handle's grasp surface position.
+   * \return the 3x1 grasp position
+  */
+  const Eigen::Vector3d& getHandsCenter() const { return hands_center_; }
 
-	std::vector<int> inliers_; ///< the list of indices of grasp hypotheses that are part of the handle
-	std::vector<GraspHypothesis> hand_list_; ///< the list of grasp hypotheses
-	Eigen::Vector3d center_; ///< the center of the "average" grasp
-	Eigen::Vector3d axis_; ///< the hand axis of the "average" grasp
-	Eigen::Vector3d approach_; ///< the approach vector of the "average" grasp
-	Eigen::Vector3d binormal_; ///< the binormal vector of the "average" grasp
-	double width_; ///< the width of the object contained in the "average" grasp
-	Eigen::Vector3d hands_center_; ///< the center of the "average" grasp projected onto the back of the hand
-	Eigen::VectorXd dist_along_handle_; ///< the 1xn vector of distances along the handle's axis for each grasp hypothesis
+  /**
+   * \brief Return the width of the object contained in the handle grasp.
+   * \return the width of the contained object
+  */
+  double getWidth() const { return width_; }
+
+  /**
+   * \brief Return the list of grasp hypotheses.
+   * \return the list of grasp hypotheses
+  */
+  const std::vector<GraspHypothesis>& getHandList() const { return hand_list_; }
+
+  /**
+   * \brief Return the list of indices of grasp hypotheses that are part of the
+   * handle.
+   * \return the list of indices of grasp hypotheses that are part of the handle
+  */
+  const std::vector<int>& getInliers() const { return inliers_; }
+
+  const Eigen::Vector3d& getBinormal() const { return binormal_; }
+
+ private:
+  /**
+   * \brief Set the variables of the grasp.
+  */
+  void setGraspVariables();
+
+  /**
+   * \brief Set the hand axis of the grasp.
+  */
+  void setAxis();
+
+  /**
+   * \brief Set the distance along the handle's axis for each grasp hypothesis.
+  */
+  void setDistAlongHandle();
+
+  /**
+   * \brief Set the width of the object contained in the handle grasp.
+  */
+  void setGraspWidth();
+
+  std::vector<int> inliers_;  ///< the list of indices of grasp hypotheses that
+                              ///are part of the handle
+  std::vector<GraspHypothesis> hand_list_;  ///< the list of grasp hypotheses
+  Eigen::Vector3d center_;    ///< the center of the "average" grasp
+  Eigen::Vector3d axis_;      ///< the hand axis of the "average" grasp
+  Eigen::Vector3d approach_;  ///< the approach vector of the "average" grasp
+  Eigen::Vector3d binormal_;  ///< the binormal vector of the "average" grasp
+  double width_;  ///< the width of the object contained in the "average" grasp
+  Eigen::Vector3d hands_center_;       ///< the center of the "average" grasp
+                                       ///projected onto the back of the hand
+  Eigen::VectorXd dist_along_handle_;  ///< the 1xn vector of distances along
+                                       ///the handle's axis for each grasp
+                                       ///hypothesis
 };
 
 #endif /* HANDLE_H_ */
